@@ -15,19 +15,30 @@ Replace this paragraph with your own summary of what your version does.
 
 ---
 
+
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommendation systems, like those used by Spotify or Netflix, analyze both user preferences and item attributes to suggest content that users are likely to enjoy. They often combine information about what similar users liked (collaborative filtering) with details about the content itself (content-based filtering). In this simulation, our recommender will prioritize matching songs to a user’s stated preferences using a content-based approach. The system will focus on how closely each song’s features align with the user’s taste profile, rewarding songs that are similar in genre, mood, and key numerical attributes.
 
-Some prompts to answer:
+**Features used:**
+- **Song:** genre, mood, energy, tempo_bpm, valence, danceability, acousticness, title, artist
+- **UserProfile:** favorite_genre, favorite_mood, target_energy, likes_acoustic
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+This approach ensures recommendations are tailored to the user’s explicit preferences for both categorical and numerical song features.
 
-You can include a simple diagram or bullet list if helpful.
+### Algorithm Recipe
+- Genre match: +2.0 points
+- Mood match: +1.0 point
+- Energy similarity: up to +1.5 points (score contribution = 1.5 * (1 - |energy_song - target_energy|))
+- Tempo similarity: up to +1.0 point (optional, e.g., 1.0 * (1 - |tempo_song - target_tempo| / 60))
+- Popularity bonus: +0.5 points if popularity > 60 (optional)
+
+#### Example final score formula
+`score = 2.0*genre_match + 1.0*mood_match + 1.5*(1 - abs(energy_song - target_energy)) + tempo_bonus + popularity_bonus`
+
+### Expected Biases
+- This system may over-prioritize genre, ignoring songs outside the favorite genre that could still match the user’s mood or energy preferences.
+- It may favor well-known/popular songs if popularity is used as a bonus, creating a “rich-get-richer” effect.
 
 ---
 
@@ -63,6 +74,27 @@ pytest
 ```
 
 You can add more tests in `tests/test_recommender.py`.
+
+---
+
+## CLI Output (Verification)
+
+Below is a captured terminal output from `python src/main.py` with the default `pop/happy` user profile. This serves as a text-based screenshot demonstrating that the system returns song titles, scores, and reasoning.
+
+```text
+Loading songs from data/songs.csv...
+Loaded songs: 17
+
+Top recommendations (pop/happy profile):
+
+Title                        Score  Reasons
+------------------------- --------  --------------------------------------------
+Sunrise City                  5.94  genre match (+2.0); mood match (+1.0); energy similarity (+1.47); tempo similarity (+0.97); popularity bonus (+0.5)
+Gym Hero                      4.60  genre match (+2.0); mood mismatch (+0.0); energy similarity (+1.30); tempo similarity (+0.80); popularity bonus (+0.5)
+Rooftop Lights                3.37  genre mismatch (+0.0); mood match (+1.0); energy similarity (+1.44); tempo similarity (+0.93)
+Digital Dreams                2.75  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.38); tempo similarity (+0.87); popularity bonus (+0.5)
+Night Drive Loop              2.26  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.42); tempo similarity (+0.83)
+```
 
 ---
 
