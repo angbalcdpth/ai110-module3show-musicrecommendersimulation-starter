@@ -79,7 +79,7 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## CLI Output (Verification)
 
-Below is a captured terminal output from `python src/main.py` with the default `pop/happy` user profile. This serves as a text-based screenshot demonstrating that the system returns song titles, scores, and reasoning.
+Below is a captured terminal output from `python src/main.py` with the default `pop/happy` user profile. 
 
 ```text
 Loading songs from data/songs.csv...
@@ -95,6 +95,40 @@ Rooftop Lights                3.37  genre mismatch (+0.0); mood match (+1.0); en
 Digital Dreams                2.75  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.38); tempo similarity (+0.87); popularity bonus (+0.5)
 Night Drive Loop              2.26  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.42); tempo similarity (+0.83)
 ```
+
+---
+
+## Adversarial Profile Result (Conflicting Preferences)
+
+Observed output from `python src/main.py` using the `Adversarial Conflicting` profile:
+
+```text
+Top recommendations (Adversarial Conflicting):
+
+Title                        Score  Reasons
+------------------------- --------  --------------------------------------------------
+Coffee Shop Stories           2.71  genre match (+2.0); mood mismatch (+0.0); energy similarity (+0.70); tempo similarity (+0.00)
+Gym Hero                      2.66  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.46); tempo similarity (+0.70); popularity bonus (+0.5)
+Digital Dreams                2.60  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.47); tempo similarity (+0.63); popularity bonus (+0.5)
+Storm Runner                  2.45  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.48); tempo similarity (+0.97)
+Sunrise City                  2.35  genre mismatch (+0.0); mood mismatch (+0.0); energy similarity (+1.38); tempo similarity (+0.47); popularity bonus (+0.5)
+```
+
+### Interpretation
+
+- The system still ranks high-energy tracks first, even though the user mood is `sad` and popularity is low, demonstrating imbalance in weight strategies.
+- `genre match` is very powerful (2.0), while `mood match` can be ignored if the strongest energy/tempo values are in tension.
+- This is exactly the “edge case” behavior the stress test was meant to reveal.
+
+### Screenshot placeholders
+
+> Include your actual screenshot images in your project repo and reference them here using markdown, e.g.:
+>
+> `![Adversarial Conflicting Output](docs/screenshot_adversarial_conflicting.png)`
+>
+> `![Pop Happy Output](docs/screenshot_pop_happy.png)`
+>
+> `![Chill Lofi Output](docs/screenshot_chill_lofi.png)`
 
 ---
 
